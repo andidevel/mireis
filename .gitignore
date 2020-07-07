@@ -1,0 +1,15 @@
+# python compiled
+*.py[cod]
+
+# Editors
+*.sublime*
+**/.vscode
+*.komo*
+.komo*
+
+# LibreOffice lock files
+.~lock*
+
+# Others
+docker-compose.yml
+mireis.sqlite3
