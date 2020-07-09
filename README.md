@@ -4,9 +4,10 @@
 
 ## Setting up
 
-Clone this repository, assuming that you already have Django installed, on the folder where *manage.py* is in, run the command:
+Clone this repository. Assuming that you already have Django installed, on the folder where *manage.py* is in, run the commands:
 
 ```bash
+$ pip install -r requirements.txt
 $ python manage.py migrate
 ```
 
