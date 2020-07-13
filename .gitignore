@@ -13,3 +13,4 @@
 # Others
 docker-compose.yml
 mireis.sqlite3
+.env
