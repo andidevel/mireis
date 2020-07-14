@@ -2,13 +2,20 @@ from django.db import models
 
 # Create your models here.
 
+class User(models.Model):
+    username = models.CharField(max_length=50, primary_key=True)
+    password = models.TextField()
+
+
 class Account(models.Model):
+    username = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     agency = models.CharField(max_length=50)
     number = models.CharField(max_length=50)
 
 
 class Transaction(models.Model):
+    username = models.ForeignKey(User, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField()
     description = models.TextField()
