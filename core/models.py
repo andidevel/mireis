@@ -8,15 +8,15 @@ class User(models.Model):
 
 
 class Account(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username')
     name = models.CharField(max_length=100)
     agency = models.CharField(max_length=50)
     number = models.CharField(max_length=50)
 
 
 class Transaction(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username')
+    account_id = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True, db_column='account_id')
     date = models.DateField()
     description = models.TextField()
     notes = models.TextField(null=True, blank=True)
