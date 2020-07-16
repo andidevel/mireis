@@ -3,19 +3,19 @@ from django.db import models
 # Create your models here.
 
 class User(models.Model):
-    username = models.CharField(max_length=50, primary_key=True)
+    username = models.CharField(max_length=150, unique=True)
     password = models.TextField()
 
 
 class Account(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username')
+    username_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username_id')
     name = models.CharField(max_length=100)
     agency = models.CharField(max_length=50)
     number = models.CharField(max_length=50)
 
 
 class Transaction(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username')
+    username_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='username_id')
     account_id = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True, db_column='account_id')
     date = models.DateField()
     description = models.TextField()
