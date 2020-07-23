@@ -7,7 +7,23 @@ from core.models import (
 )
 from core.lib import utils
 
-# Create your tests here.
+
+class ValidateTest(TestCase):
+
+    def test_email_validate(self):
+        emails_to_test = [
+            ('test_example@test.com', True),
+            ('test.example@t.io', True),
+            ('testexample.t@test.com.br', True),
+            ('test_example', False),
+            ('test_example@', False),
+            ('test_example@test.com.', False),
+            ('test_example@test.', False),
+        ]
+        for email in emails_to_test:
+            print('Checking:', email)
+            self.assertEqual(utils.email_validate(email[0]), email[1])
+
 
 class LoginTest(TestCase):
 

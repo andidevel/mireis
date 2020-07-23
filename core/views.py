@@ -12,7 +12,16 @@ from .models import (
     Transaction
 )
 
-# Create your views here.
+
+def require_login(f):
+    def f_wrapper(request):
+        if 'user' in request.session:
+            return f(request)
+        else:
+            return HttpResponseRedirect(reverse('core:index'))
+    
+    return f_wrapper
+
 
 def index(request):
     context = {
@@ -46,7 +55,7 @@ def register(request):
     context = {}
     return render(request, 'core/register.html.j2', context)
 
-
+@require_login
 def journal(request):
     context = {}
     return render(request, 'core/journal.html.j2', context)
