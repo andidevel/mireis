@@ -12,12 +12,13 @@ from .models import (
     Transaction
 )
 
-
+  
 def require_login(f):
     def f_wrapper(request):
         if 'user' in request.session:
             return f(request)
         else:
+            messages.add_message(request, messages.WARNING, 'You must be logged in to access this resource!')
             return HttpResponseRedirect(reverse('core:index'))
     
     return f_wrapper
@@ -52,7 +53,33 @@ def login(request):
 
 
 def register(request):
-    context = {}
+    if request.POST:
+        try:
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            password_again = request.POST.get('password_again')
+            if not utils.email_validate(username):
+                raise Exception(f'{username} is not a valid e-mail!')
+            if password != password_again:
+                raise Exception('Password does not match!')
+            username = username.lower()
+            try:
+                User.objects.get(username=username)
+                messages.add_message(request, messages.ERROR, f'{username} already exists. Try another e-mail!')
+            except User.DoesNotExist:
+                # OK, username does not exist, so lets add him
+                user = User(username=username, password=utils.password_digest(password))
+                user.save()
+                request.session['user'] = {
+                    'user_id': user.id,
+                    'username': user.username
+                }
+                return HttpResponseRedirect(reverse('core:journal'))
+        except Exception as e:
+            messages.add_message(request, messages.ERROR, e)
+    context = {
+        'messages': messages.get_messages(request)
+    }
     return render(request, 'core/register.html.j2', context)
 
 @require_login

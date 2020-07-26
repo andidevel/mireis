@@ -30,11 +30,14 @@
                     <div class="position-sticky pt-3">
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">
-                                    <i class="fas fa-home"></i>
-                                    Dashboard
+                                <a class="nav-link" href="#">
+                                    <i class="fas fa-user"></i>
+                                    <i><small>{{ request.session.user.username }}</small></i>
                                 </a>
                             </li>
+                        </ul>
+                        <hr>
+                        <ul class="nav flex-column">
                             <li class="nav-item">
                                 <a class="nav-link" href="#">
                                     <i class="fas fa-file-invoice-dollar"></i>
@@ -42,10 +45,16 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Transaction</a>
+                                <a class="nav-link" href="#">
+                                    <i class="fas fa-money-bill-alt"></i>
+                                    Transaction
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url('core:logout') }}">Sign out</a>
+                                <a class="nav-link" href="{{ url('core:logout') }}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Sign out
+                                </a>
                             </li>
                         </ul>
                     </div>
