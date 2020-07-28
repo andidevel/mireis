@@ -53,6 +53,9 @@ def login(request):
 
 
 def register(request):
+    context = {
+        'messages': messages.get_messages(request)
+    }
     if request.POST:
         try:
             username = request.POST.get('username')
@@ -77,10 +80,9 @@ def register(request):
                 return HttpResponseRedirect(reverse('core:journal'))
         except Exception as e:
             messages.add_message(request, messages.ERROR, e)
-    context = {
-        'messages': messages.get_messages(request)
-    }
+        return HttpResponseRedirect(reverse('core:register'))
     return render(request, 'core/register.html.j2', context)
+
 
 @require_login
 def journal(request):
