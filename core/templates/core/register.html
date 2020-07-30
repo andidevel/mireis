@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+        <meta name="generator" content="Hugo 0.72.0">
+        <title>Mi Réis</title>
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+        <!-- Custom styles for this template -->
+        {% load static %}
+        <link href="{% static 'core/css/base.css' %}" rel="stylesheet">
+    </head>
+    <body class="d-flex h-100 text-center text-white bg-dark">
+    
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <header class="mb-auto">
+                <div>
+                    <h3 class="float-md-left mb-0"><a href="{% url 'core:index' %}">Mi Réi$</a></h3>
+                </div>  
+            </header>
+
+            <main class="px-3">
+                <div>
+                    <form method="post" action="{% url 'core:register' %}">
+                        {% csrf_token %}
+{% if  messages %}
+    {% for message in messages %}
+                        <p class="{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+                        <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+                        <label for="username" class="sr-only">Email address</label>
+                        <input type="email" name="username" id="username" class="form-control" placeholder="Email address" required autofocus>
+                        <label for="password" class="sr-only">Password</label>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                        <label for="password_again" class="sr-only">Repeat Password</label>
+                        <input type="password" name="password_again" id="password_again" class="form-control" placeholder="Repeat Password" required>
+                        <hr>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+                        <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+                    </form>
+                </div>
+            </main>
+        </div>  
+    </body>
+</html>

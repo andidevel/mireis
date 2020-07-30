@@ -28,7 +28,7 @@ def index(request):
     context = {
         'messages': messages.get_messages(request)
     }
-    return render(request, 'core/index.html.j2', context)
+    return render(request, 'core/index.html', context)
 
 
 def login(request):
@@ -81,13 +81,20 @@ def register(request):
         except Exception as e:
             messages.add_message(request, messages.ERROR, e)
         return HttpResponseRedirect(reverse('core:register'))
-    return render(request, 'core/register.html.j2', context)
+    return render(request, 'core/register.html', context)
 
 
 @require_login
 def journal(request):
     context = {}
-    return render(request, 'core/journal.html.j2', context)
+    return render(request, 'core/journal.html', context)
+
+
+@require_login
+def account_list(request):
+    context = {}
+    context['account_list'] = Account.objects.filter(username=request.session['user'].get('user_id'))
+    return render(request, 'core/account-list.html', context)
 
 
 def logout(request):

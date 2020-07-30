@@ -9,16 +9,17 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
 
         <!-- Custom styles for this template -->
-        <link href="{{ static('core/css/dashboard.css') }}" rel="stylesheet">
+        {% load static %}
+        <link href="{% static 'core/css/dashboard.css' %}" rel="stylesheet">
         <!-- fontawesome //-->
-        <link href="{{ static('core/css/fontawesome.min.css') }}" rel="stylesheet">
+        <link href="{% static 'core/css/fontawesome.min.css' %}" rel="stylesheet">
 {% block custom_css %}
 {% endblock custom_css %}
         <title>Mi Réis</title>
     </head>
     <body>
         <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-            <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="{{ url('core:index') }}">Mi Réi$</a>
+            <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="{% url 'core:index' %}">Mi Réi$</a>
             <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -41,7 +42,7 @@
                         <hr>
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" href="{% url 'core:account-list' %}">
                                     <i class="fas fa-file-invoice-dollar"></i>
                                     Accounts
                                 </a>
@@ -53,7 +54,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url('core:logout') }}">
+                                <a class="nav-link" href="{% url 'core:logout' %}">
                                     <i class="fas fa-sign-out-alt"></i>
                                     Sign out
                                 </a>
