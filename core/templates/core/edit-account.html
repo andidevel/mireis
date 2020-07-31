@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block search %}
+
+{% endblock search %}
+
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Account</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+    {% if form.account_id %}
+                <a href="{% url 'core:del-account' form.account_id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+    {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-body">
+    {% if form.account_id %}
+        <form method="POST" action="{% url 'core:save-account-edit' form.account_id %}">
+
+    {% else %}
+        <form method="POST" action="{% url 'core:save-account-add' %}">
+    {% endif %}
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="account_name" class="form-label">Name</label>
+                <input type="text" class="form-control" name="account_name" id="account_name" value="{{ form.account_name }}">
+            </div>
+            <div class="mb-3">
+                <label for="account_agency" class="form-label">Agency</label>
+                <input type="text" class="form-control" name="account_agency" id="account_agency" value="{{ form.account_agency }}">
+            </div>
+            <div class="mb-3">
+                <label for="account_number" class="form-label">Number</label>
+                <input type="text" class="form-control" name="account_number" id="account_number" value="{{ form.account_number }}">
+            </div>
+            <button type="submit" class="btn btn-secondary">Save</button>
+        </form>
+    </div>
+
+{% endblock content %}

@@ -122,7 +122,7 @@ class AccountRequestTest(BaseRequestTestCase):
         self.assertIs('account_list' in response.context, True)
         self.assertEqual(response.context['account_list'][0].name, test_account.name)
 
-    def test_account_list_fail(self):
+    def test_account_list_only_logged(self):
         self.authenticated_session()
         test_account = self.create_account(
             user=self.test_user,
@@ -138,7 +138,47 @@ class AccountRequestTest(BaseRequestTestCase):
             number='2'
         )
         response = self.client.get(reverse('core:account-list'))
-        self.assertIs('account_list' in response.context, True)
+        self.assertIn('account_list', response.context)
         for acc in response.context['account_list']:
-            print(f'Checking account against: {acc.name}')
+            print(f'Checking account "{another_user_account.name}" against: "{acc.name}"')
             self.assertNotEqual(acc.name, another_user_account.name)
+
+    def test_account_save_new(self):
+        self.authenticated_session()
+        response = self.client.post(reverse('core:save-account-add'), {
+            'account_name': 'New Account',
+            'account_agency': 'AG',
+            'account_number': '1'
+        })
+        self.assertRedirects(response, reverse('core:edit-account', args=(1,)))
+
+    def test_account_save_edit(self):
+        self.authenticated_session()
+        test_account = self.create_account(
+            user=self.test_user,
+            name='Account Test',
+            agency='0001',
+            number='1'
+        )
+        response = self.client.post(reverse('core:save-account-edit', args=(1,)), {
+            'account_name': 'Account [edited]',
+            'account_agency': 'AG [edited]',
+            'account_number': '1'
+        })
+        self.assertRedirects(response, reverse('core:edit-account', args=(1,)))
+        edited_account = Account.objects.get(pk=1)
+        print(f'Edited? {test_account.name} != {edited_account.name}')
+        self.assertNotEqual(test_account.name, edited_account.name)
+
+    def test_account_delete(self):
+        self.authenticated_session()
+        test_account = self.create_account(
+            user=self.test_user,
+            name='Account Test to Delete',
+            agency='0001',
+            number='1'
+        )
+        response = self.client.get(reverse('core:del-account', args=(1,)))
+        self.assertRedirects(response, reverse('core:account-list'))
+        with self.assertRaisesMessage(Account.DoesNotExist, 'Account matching query does not exist.'):
+            Account.objects.get(pk=1)

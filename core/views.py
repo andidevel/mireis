@@ -1,5 +1,9 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import (
+    render,
+    get_object_or_404,
+    redirect
+)
+from django.http import Http404
 from django.urls import reverse
 from django.contrib import messages
 
@@ -14,20 +18,18 @@ from .models import (
 
   
 def require_login(f):
-    def f_wrapper(request):
+    def f_wrapper(request, **kw):
         if 'user' in request.session:
-            return f(request)
+            return f(request, **kw)
         else:
             messages.add_message(request, messages.WARNING, 'You must be logged in to access this resource!')
-            return HttpResponseRedirect(reverse('core:index'))
+            return redirect('core:index')
     
     return f_wrapper
 
 
 def index(request):
-    context = {
-        'messages': messages.get_messages(request)
-    }
+    context = {}
     return render(request, 'core/index.html', context)
 
 
@@ -44,18 +46,16 @@ def login(request):
                 'user_id': user.id,
                 'username': user.username
             }
-            return HttpResponseRedirect(reverse('core:journal'))
+            return redirect('core:journal')
     except User.DoesNotExist:
         pass
     # Username and/or password invalid
     messages.add_message(request, messages.ERROR, 'User and/or password invalid!')
-    return HttpResponseRedirect(reverse('core:index'))
+    return redirect('core:index')
 
 
 def register(request):
-    context = {
-        'messages': messages.get_messages(request)
-    }
+    context = {}
     if request.POST:
         try:
             username = request.POST.get('username')
@@ -77,10 +77,10 @@ def register(request):
                     'user_id': user.id,
                     'username': user.username
                 }
-                return HttpResponseRedirect(reverse('core:journal'))
+                return redirect('core:journal')
         except Exception as e:
             messages.add_message(request, messages.ERROR, e)
-        return HttpResponseRedirect(reverse('core:register'))
+        return redirect('core:register')
     return render(request, 'core/register.html', context)
 
 
@@ -97,6 +97,58 @@ def account_list(request):
     return render(request, 'core/account-list.html', context)
 
 
+@require_login
+def add_account(request):
+    context = {
+        'form': {
+            'account_id': '',
+            'account_name': '',
+            'account_agency': '',
+            'account_number': '',
+        }
+    }
+    return render(request, 'core/edit-account.html', context)
+
+
+@require_login
+def edit_account(request, pk):
+    account = get_object_or_404(Account, username=request.session['user'].get('user_id'), pk=pk)
+    context = {
+        'form': {
+            'account_id': account.id,
+            'account_name': account.name,
+            'account_agency': account.agency,
+            'account_number': account.number,
+        }
+    }
+    return render(request, 'core/edit-account.html', context)
+
+
+@require_login
+def save_account(request, pk=None):
+    if request.POST:
+        if pk:
+            account = get_object_or_404(Account, username=request.session['user'].get('user_id'), pk=pk)
+        else:
+            account = Account()
+            logged_user = User.objects.get(pk=request.session['user'].get('user_id'))
+            account.username = logged_user
+        account.name = request.POST.get('account_name')
+        account.agency = request.POST.get('account_agency')
+        account.number = request.POST.get('account_number')
+        account.save()
+        messages.add_message(request, messages.SUCCESS, 'Account save successfuly!')
+        return redirect('core:edit-account', pk=account.id)
+    raise Http404('Resource not found')
+
+
+@require_login
+def del_account(request, pk):
+    account = get_object_or_404(Account, username=request.session['user'].get('user_id'), pk=pk)
+    account.delete()
+    return redirect('core:account-list')
+
+
 def logout(request):
     # Do the logout
     try:
@@ -104,4 +156,4 @@ def logout(request):
     except KeyError:
         pass
     request.session.flush()
-    return HttpResponseRedirect(reverse('core:index'))
+    return redirect('core:index')

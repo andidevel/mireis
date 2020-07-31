@@ -10,4 +10,9 @@ urlpatterns = [
     path('logout', views.logout, name='logout'),
     path('journal', views.journal, name='journal'),
     path('account-list', views.account_list, name='account-list'),
+    path('add-account', views.add_account, name='add-account'),
+    path('edit-account/<int:pk>', views.edit_account, name='edit-account'),
+    path('save-account', views.save_account, name='save-account-add'),
+    path('save-account/<int:pk>', views.save_account, name='save-account-edit'),
+    path('del-account/<int:pk>', views.del_account, name='del-account'),
 ]
