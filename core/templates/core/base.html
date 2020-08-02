@@ -63,6 +63,12 @@
                     </div>
                 </nav>
                 <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+{% if  messages %}
+    {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+                
 {% block content %}
 {% endblock content %}
                 </main>
