@@ -131,8 +131,7 @@ def save_account(request, pk=None):
             account = get_object_or_404(Account, username=request.session['user'].get('user_id'), pk=pk)
         else:
             account = Account()
-            logged_user = User.objects.get(pk=request.session['user'].get('user_id'))
-            account.username = logged_user
+            account.username_id = request.session['user'].get('user_id') 
         account.name = request.POST.get('account_name')
         account.agency = request.POST.get('account_agency')
         account.number = request.POST.get('account_number')

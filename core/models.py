@@ -10,8 +10,8 @@ class User(models.Model):
 class Account(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    agency = models.CharField(max_length=50)
-    number = models.CharField(max_length=50)
+    agency = models.CharField(max_length=50, null=True, blank=True)
+    number = models.CharField(max_length=50, null=True, blank=True)
 
 
 class Transaction(models.Model):
