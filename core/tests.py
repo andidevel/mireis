@@ -1,3 +1,7 @@
+import json
+
+from datetime import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 from core.models import (
@@ -182,3 +186,25 @@ class AccountRequestTest(BaseRequestTestCase):
         self.assertRedirects(response, reverse('core:account-list'))
         with self.assertRaisesMessage(Account.DoesNotExist, 'Account matching query does not exist.'):
             Account.objects.get(pk=1)
+
+
+class TransactionRequestTest(BaseRequestTestCase):
+
+    def test_get_transaction_success(self):
+        self.authenticated_session()
+        test_transaction = Transaction.objects.create(
+            username=self.test_user,
+            date=datetime.today().date(),
+            description='Transaction Test',
+            amount=120.15,
+            checked=0,
+        )
+        test_json_response = json.dumps(
+            {
+                'error_message': '',
+                'data': utils.model_as_dict([test_transaction]),
+            },
+            ensure_ascii=False
+        )
+        response = self.client.get(reverse('core:transaction', args=(test_transaction.id,)))
+        self.assertEqual(test_json_response, response.content.decode('utf-8'))
