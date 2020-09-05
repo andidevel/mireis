@@ -1,6 +1,7 @@
 import json
 
 from datetime import datetime
+from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
@@ -208,3 +209,47 @@ class TransactionRequestTest(BaseRequestTestCase):
         )
         response = self.client.get(reverse('core:transaction', args=(test_transaction.id,)))
         self.assertEqual(test_json_response, response.content.decode('utf-8'))
+
+    def test_transaction_add_success(self):
+        self.authenticated_session()
+        data_test = {
+            'date': datetime.today().date().strftime('%Y-%m-%d'),
+            'description': 'Add transaction test',
+            'amount': '121.16',
+            'checked': '0',
+        }
+        response = self.client.post(reverse('core:save-transaction-add'), data_test)
+        response_obj = json.loads(response.content.decode('utf-8'))
+        data = response_obj['data'][0]
+        saved_model = Transaction.objects.get(pk=int(data.get('id')))
+        self.assertEqual(saved_model.username, self.test_user)
+        self.assertEqual(saved_model.description, data_test['description'])
+        self.assertEqual(saved_model.amount, Decimal(data_test['amount']))
+        self.assertEqual(saved_model.date, datetime.strptime(data_test['date'], '%Y-%m-%d').date())
+        self.assertEqual(saved_model.checked, int(data_test['checked']))
+
+    def test_transaction_edit_success(self):
+        self.authenticated_session()
+        today = datetime.today().date()
+        data_test = {
+            'date': today.strftime('%Y-%m-%d'),
+            'description': 'Description Updated',
+            'amount': '1.16',
+            'checked': '1',
+        }
+        test_transaction = Transaction.objects.create(
+            username=self.test_user,
+            date=today,
+            description='Transaction Test',
+            amount=120.15,
+            checked=0,
+        )
+        response = self.client.post(reverse('core:save-transaction-edit', args=(test_transaction.id,)), data_test)
+        response_obj = json.loads(response.content.decode('utf-8'))
+        data = response_obj['data'][0]
+        saved_model = Transaction.objects.get(pk=test_transaction.id)
+        self.assertEqual(saved_model.username, self.test_user)
+        self.assertEqual(saved_model.description, data_test['description'])
+        self.assertEqual(saved_model.amount, Decimal(data_test['amount']))
+        self.assertEqual(saved_model.date, datetime.strptime(data_test['date'], '%Y-%m-%d').date())
+        self.assertEqual(saved_model.checked, int(data_test['checked']))

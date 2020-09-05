@@ -24,3 +24,4 @@ class Transaction(models.Model):
     check_code = models.CharField(max_length=50)
     checked = models.SmallIntegerField()
     tags = models.TextField(null=True, blank=True)
+

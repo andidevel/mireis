@@ -1,9 +1,15 @@
+import functools
+import datetime
+
 from django.shortcuts import (
     render,
     get_object_or_404,
     redirect
 )
-from django.http import Http404
+from django.http import (
+    JsonResponse,
+    Http404
+)
 from django.urls import reverse
 from django.contrib import messages
 
@@ -17,15 +23,41 @@ from .models import (
 )
 
   
-def require_login(f):
-    def f_wrapper(request, **kw):
-        if 'user' in request.session:
-            return f(request, **kw)
-        else:
-            messages.add_message(request, messages.WARNING, 'You must be logged in to access this resource!')
-            return redirect('core:index')
-    
-    return f_wrapper
+def require_login(_func=None, *, response_type=None):
+    def real_decorator(f):
+        @functools.wraps(f) # Keep original information about decorated function
+        def f_wrapper(request, **kw):
+            if 'user' in request.session:
+                return f(request, **kw)
+            else:
+                if response_type == 'json':
+                    return JsonResponse(
+                        {
+                            'error_message':'You must be logged in to access this resource',
+                            'data': []
+                        }
+                    )
+                messages.add_message(request, messages.WARNING, 'You must be logged in to access this resource!')
+                return redirect('core:index')
+        return f_wrapper
+    if _func is None:
+        return real_decorator
+    else:
+        return real_decorator(_func)
+
+
+# def ajax_require_login(f):
+#     def f_wrapper(request, **kw):
+#         if 'user' in request.session:
+#             return f(request, **kw)
+#         else:
+#             return JsonResponse(
+#                 {
+#                     'error_message':'You must be logged in to access this resource',
+#                     'data': []
+#                 }
+#             )
+#     return f_wrapper
 
 
 def index(request):
@@ -146,6 +178,45 @@ def del_account(request, pk):
     account = get_object_or_404(Account, username=request.session['user'].get('user_id'), pk=pk)
     account.delete()
     return redirect('core:account-list')
+
+
+@require_login(response_type='json')
+def get_transaction(request, pk):
+    json_response = {
+        'error_message': '',
+        'data': []
+    }
+
+    try:
+        trs = Transaction.objects.get(username=request.session['user'].get('user_id'), pk=pk)
+        json_response['data'].append(utils.model_row_as_dict(trs))
+    except Transaction.DoesNotExist:
+        json_response['error_message'] = 'Transaction not found'
+        json_response['data'] = []
+    return JsonResponse(json_response)
+
+
+@require_login(response_type='json')
+def save_transaction(request, pk=None):
+    if request.POST:
+        json_response = {
+            'error_message': '',
+            'data': []
+        }
+        if pk:
+            transaction = get_object_or_404(Transaction, username=request.session['user'].get('user_id'), pk=pk)
+        else:
+            transaction = Transaction()
+            transaction.username_id = request.session['user'].get('user_id')
+        transaction.date = datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d').date()
+        transaction.description = request.POST.get('description')
+        transaction.amount = float(request.POST.get('amount'))
+        transaction.checked = int(request.POST.get('checked'))
+        transaction.account_id = int(request.POST.get('account_id')) if request.POST.get('account_id') else None
+        transaction.save()
+        json_response['data'].append(utils.model_row_as_dict(transaction))
+        return JsonResponse(json_response)
+    raise Http404('Resource not found')
 
 
 def logout(request):

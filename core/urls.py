@@ -15,4 +15,7 @@ urlpatterns = [
     path('save-account', views.save_account, name='save-account-add'),
     path('save-account/<int:pk>', views.save_account, name='save-account-edit'),
     path('del-account/<int:pk>', views.del_account, name='del-account'),
+    path('transaction/<int:pk>', views.get_transaction, name='transaction'),
+    path('save-transaction', views.save_transaction, name='save-transaction-add'),
+    path('save-transaction/<int:pk>', views.save_transaction, name='save-transaction-edit'),
 ]
